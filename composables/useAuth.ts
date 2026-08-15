@@ -19,9 +19,6 @@ interface SessionUser {
 const USERS_KEY = 'cc_users'
 const SESSION_KEY = 'cc_session'
 
-const currentUser = useState<SessionUser | null>('cc_current_user', () => null)
-const ready = useState<boolean>('cc_auth_ready', () => false)
-
 function readUsers(): StoredUser[] {
   if (import.meta.server) return []
   try {
@@ -37,6 +34,9 @@ function writeUsers(users: StoredUser[]) {
 }
 
 export function useAuth() {
+  const currentUser = useState<SessionUser | null>('cc_current_user', () => null)
+  const ready = useState<boolean>('cc_auth_ready', () => false)
+
   function init() {
     if (import.meta.server || ready.value) return
     try {

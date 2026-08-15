@@ -8,15 +8,16 @@ interface CartLine {
 }
 
 const CART_KEY = 'cc_cart'
-const lines = useState<CartLine[]>('cc_cart_lines', () => [])
-const loaded = useState<boolean>('cc_cart_loaded', () => false)
-
-function persist() {
-  if (import.meta.server) return
-  localStorage.setItem(CART_KEY, JSON.stringify(lines.value))
-}
 
 export function useCart() {
+  const lines = useState<CartLine[]>('cc_cart_lines', () => [])
+  const loaded = useState<boolean>('cc_cart_loaded', () => false)
+
+  function persist() {
+    if (import.meta.server) return
+    localStorage.setItem(CART_KEY, JSON.stringify(lines.value))
+  }
+
   function load() {
     if (import.meta.server || loaded.value) return
     try {

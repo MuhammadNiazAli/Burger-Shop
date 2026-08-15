@@ -12,10 +12,11 @@ interface Order {
 }
 
 const ORDERS_KEY = 'cc_orders'
-const orders = useState<Order[]>('cc_orders', () => [])
-const loaded = useState<boolean>('cc_orders_loaded', () => false)
 
 export function useOrders() {
+  const orders = useState<Order[]>('cc_orders', () => [])
+  const loaded = useState<boolean>('cc_orders_loaded', () => false)
+
   function load() {
     if (import.meta.server || loaded.value) return
     try {
