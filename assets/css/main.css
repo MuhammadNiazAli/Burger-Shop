@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-paper text-charcoal font-body antialiased;
+  }
+  ::selection {
+    @apply bg-ember/30 text-charcoal;
+  }
+  :focus-visible {
+    outline: 2px solid #E3A008;
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /* Signature element: kitchen-ticket card, torn/perforated edge, used for menu items */
+  .ticket {
+    position: relative;
+    background: #FFFDF8;
+    border: 1px solid rgba(28, 23, 18, 0.1);
+  }
+  .ticket::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background-image: radial-gradient(circle at 10px 0, transparent 6px, #FAF6EC 6.5px);
+    background-size: 20px 10px;
+    background-repeat: repeat-x;
+  }
+
+  .eyebrow {
+    @apply font-mono text-[11px] uppercase tracking-widest2 text-flame;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-ember text-charcoal font-mono font-semibold uppercase tracking-wide text-sm px-6 py-3 transition-transform duration-150 hover:-translate-y-0.5 hover:bg-ember/90 active:translate-y-0;
+    clip-path: polygon(0 0, 100% 0, 100% 70%, 96% 100%, 0 100%);
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 border border-charcoal/25 text-charcoal font-mono uppercase tracking-wide text-sm px-6 py-3 transition-colors duration-150 hover:border-charcoal hover:bg-charcoal hover:text-paper;
+  }
+
+  .field {
+    @apply w-full bg-transparent border-b-2 border-charcoal/20 px-1 py-3 font-body text-charcoal placeholder:text-smoke focus:border-flame outline-none transition-colors;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
