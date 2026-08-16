@@ -12,6 +12,22 @@ const photo = ref<string | null>(null)
 const photoLoading = ref(true)
 const heartBounce = ref(false)
 
+const cardEl = ref<HTMLElement | null>(null)
+
+// Subtle tilt toward the cursor — capped small so it reads as "premium",
+// not gimmicky, and is fully skipped for prefers-reduced-motion via CSS.
+function handleTilt(e: PointerEvent) {
+  if (!cardEl.value) return
+  const rect = cardEl.value.getBoundingClientRect()
+  const relX = (e.clientX - rect.left) / rect.width - 0.5
+  const relY = (e.clientY - rect.top) / rect.height - 0.5
+  cardEl.value.style.transform = `rotateX(${(-relY * 5).toFixed(2)}deg) rotateY(${(relX * 5).toFixed(2)}deg) translateY(-4px)`
+}
+function resetTilt() {
+  if (!cardEl.value) return
+  cardEl.value.style.transform = ''
+}
+
 onMounted(async () => {
   loadFavorites()
   photo.value = await resolveImage(props.item.id, props.item.category, props.item.image)
@@ -39,8 +55,14 @@ function handleToggleFavorite() {
 </script>
 
 <template>
-  <article class="group bg-white border border-charcoal/10 rounded-xl overflow-hidden flex flex-col h-full transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_-16px_rgba(28,23,18,0.25)] hover:border-charcoal/20">
-    <div class="relative bg-[#F1ECDF] h-44 overflow-hidden">
+  <div class="tilt-wrap h-full">
+  <article
+    ref="cardEl"
+    class="tilt-card group bg-white border border-charcoal/10 rounded-xl overflow-hidden flex flex-col h-full transition-shadow duration-200 hover:shadow-[0_20px_38px_-16px_rgba(28,23,18,0.3)] hover:border-charcoal/20"
+    @pointermove="handleTilt"
+    @pointerleave="resetTilt"
+  >
+    <div class="relative bg-[#F1ECDF] h-44 overflow-hidden shine">
       <span v-if="item.tag" class="absolute top-3 left-3 z-10 bg-charcoal text-paper text-[10px] font-mono font-semibold uppercase tracking-widest2 px-2.5 py-1 rounded-full">
         {{ item.tag }}
       </span>
@@ -77,7 +99,7 @@ function handleToggleFavorite() {
       <p class="text-sm text-charcoal/60 leading-relaxed flex-1">{{ item.desc }}</p>
 
       <button
-        class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold uppercase tracking-wide font-mono transition-all duration-150 active:scale-[0.97]"
+        class="ripple mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold uppercase tracking-wide font-mono transition-all duration-150 active:scale-[0.97]"
         :class="justAdded ? 'bg-basil text-paper' : 'bg-charcoal text-paper hover:bg-flame'"
         @click="handleAdd"
       >
@@ -86,4 +108,5 @@ function handleToggleFavorite() {
       </button>
     </div>
   </article>
+  </div>
 </template>

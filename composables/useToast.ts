@@ -1,34 +1,21 @@
+// Toast notifications are now powered by vue-sonner (rendered via <Toaster />
+// in app.vue, themed in main.css under the [data-sonner-toaster] block).
+// The success/error/info API below is kept identical to before so every
+// existing call site (MenuCard, TheNavbar, CartDrawer, checkout, login, ...)
+// needs zero changes.
+import { toast as sonnerToast } from 'vue-sonner'
+
 export type ToastType = 'success' | 'error' | 'info'
 
-export interface ToastItem {
-  id: number
-  type: ToastType
-  title: string
-  message?: string
-  duration: number
+function push(type: ToastType, title: string, message?: string) {
+  const opts = { description: message, duration: 3400 }
+  if (type === 'success') sonnerToast.success(title, opts)
+  else if (type === 'error') sonnerToast.error(title, opts)
+  else sonnerToast(title, opts)
 }
 
-let counter = 0
-
 export function useToast() {
-  const toasts = useState<ToastItem[]>('cc_toasts', () => [])
-
-  function dismiss(id: number) {
-    toasts.value = toasts.value.filter((t) => t.id !== id)
-  }
-
-  function push(type: ToastType, title: string, message?: string, duration = 3400) {
-    const id = ++counter
-    toasts.value = [...toasts.value, { id, type, title, message, duration }]
-    if (import.meta.client) {
-      setTimeout(() => dismiss(id), duration)
-    }
-    return id
-  }
-
   return {
-    toasts,
-    dismiss,
     success: (title: string, message?: string) => push('success', title, message),
     error: (title: string, message?: string) => push('error', title, message),
     info: (title: string, message?: string) => push('info', title, message)

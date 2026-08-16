@@ -7,8 +7,18 @@ const route = useRoute()
 const router = useRouter()
 const cartOpen = ref(false)
 const mobileOpen = ref(false)
+const badgeBounce = ref(false)
 
 onMounted(() => load())
+
+watch(count, (val, prev) => {
+  if (val === prev) return
+  badgeBounce.value = false
+  nextTick(() => {
+    badgeBounce.value = true
+    setTimeout(() => (badgeBounce.value = false), 450)
+  })
+})
 
 // Close any open overlay the instant a navigation starts, not after it
 // resolves — avoids the drawer/backdrop briefly intercepting the next click.
@@ -68,12 +78,16 @@ async function doLogout() {
 
         <div v-if="currentUser" class="flex items-center gap-3">
           <button
-            class="relative w-10 h-10 flex items-center justify-center border border-charcoal/20 rounded-full hover:border-charcoal transition-colors"
+            class="relative w-10 h-10 flex items-center justify-center border border-charcoal/20 rounded-full hover:border-charcoal hover:-translate-y-0.5 active:scale-90 transition-all duration-150"
             aria-label="View cart"
             @click="cartOpen = true"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h2l.4 2M7 13h10l3-8H5.4M7 13L5.4 5M7 13l-2.3 4.6A1 1 0 0 0 5.6 19H17M17 19a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3ZM9 19a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"/></svg>
-            <span v-if="count > 0" class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-flame text-paper text-[10px] font-mono flex items-center justify-center">{{ count }}</span>
+            <span
+              v-if="count > 0"
+              class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-flame text-paper text-[10px] font-mono flex items-center justify-center"
+              :class="badgeBounce && 'badge-pop'"
+            >{{ count }}</span>
           </button>
 
           <NuxtLink to="/profile" class="hidden lg:flex items-center gap-2.5 group pl-1" aria-label="Your profile">

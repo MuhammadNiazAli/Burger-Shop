@@ -5,6 +5,7 @@ const { currentUser } = useAuth()
 const { add } = useCart()
 const { resolveImage } = useFoodImages()
 const toast = useToast()
+const { onPointerMove: onCtaMove, onPointerLeave: onCtaLeave } = useMagnetic(8)
 const activeCategory = ref<typeof categories[number]>('Burgers')
 const search = ref('')
 const sortBy = ref<'popular' | 'price-asc' | 'price-desc' | 'rating'>('popular')
@@ -37,6 +38,12 @@ function addSpotlight() {
   setTimeout(() => (spotlightAdded.value = false), 900)
 }
 
+// Trust-bar numbers count up into view instead of appearing static.
+const rating = useCountUp(4.8)
+const orders = useCountUp(25)
+const kitchenTime = useCountUp(18)
+const locationsCount = useCountUp(3)
+
 const testimonials = [
   {
     quote: 'The Char Classic is the best smash burger I have had outside of a proper diner. The char is real, not just a name.',
@@ -62,16 +69,45 @@ const testimonials = [
     <section class="relative overflow-hidden bg-charcoal text-paper">
       <div class="absolute inset-0 bg-grain"></div>
       <div class="relative mx-auto max-w-6xl px-5 sm:px-8 pt-14 pb-16 sm:pt-20 sm:pb-20 grid lg:grid-cols-[1.15fr_1fr] gap-12 items-center">
-        <div>
-          <span class="eyebrow text-ember">Welcome back, {{ currentUser?.name.split(' ')[0] }}</span>
-          <h1 class="font-display font-extrabold text-5xl sm:text-6xl lg:text-7xl leading-[1.05] mt-5 [text-wrap:balance]">
+        <div
+          v-motion
+          :initial="{ opacity: 0, y: 26 }"
+          :enter="{ opacity: 1, y: 0, transition: { duration: 550, ease: 'easeOut' } }"
+        >
+          <span
+            v-motion
+            :initial="{ opacity: 0, y: 10 }"
+            :enter="{ opacity: 1, y: 0, transition: { duration: 450, delay: 60 } }"
+            class="eyebrow text-ember"
+          >Welcome back, {{ currentUser?.name.split(' ')[0] }}</span>
+          <h1
+            v-motion
+            :initial="{ opacity: 0, y: 16 }"
+            :enter="{ opacity: 1, y: 0, transition: { duration: 550, delay: 120 } }"
+            class="font-display font-extrabold text-5xl sm:text-6xl lg:text-7xl leading-[1.05] mt-5 [text-wrap:balance]"
+          >
             Cooked over open <span class="text-flame">flame.</span>
           </h1>
-          <p class="font-accent italic text-paper/70 text-lg sm:text-xl max-w-md mt-6 leading-relaxed">
+          <p
+            v-motion
+            :initial="{ opacity: 0, y: 16 }"
+            :enter="{ opacity: 1, y: 0, transition: { duration: 550, delay: 220 } }"
+            class="font-accent italic text-paper/70 text-lg sm:text-xl max-w-md mt-6 leading-relaxed"
+          >
             Smash-pressed burgers and wood-fired pizza, char-marked to order.
           </p>
-          <div class="flex flex-wrap items-center gap-4 mt-9">
-            <a href="#menu" class="btn-primary">View the menu</a>
+          <div
+            v-motion
+            :initial="{ opacity: 0, y: 16 }"
+            :enter="{ opacity: 1, y: 0, transition: { duration: 550, delay: 320 } }"
+            class="flex flex-wrap items-center gap-4 mt-9"
+          >
+            <a
+              href="#menu"
+              class="magnetic glow-ember btn-primary"
+              @pointermove="onCtaMove"
+              @pointerleave="onCtaLeave"
+            >View the menu</a>
             <div class="flex items-center gap-2 text-sm text-paper/70">
               <StarRating :rating="4.8" />
               <span>from 6,200+ orders</span>
@@ -80,7 +116,12 @@ const testimonials = [
         </div>
 
         <!-- Spotlight product card -->
-        <div class="bg-paper text-charcoal rounded-2xl p-6 shadow-2xl">
+        <div
+          v-motion
+          :initial="{ opacity: 0, x: 32, y: 8 }"
+          :enter="{ opacity: 1, x: 0, y: 0, transition: { duration: 600, delay: 180, ease: 'easeOut' } }"
+          class="bg-paper text-charcoal rounded-2xl p-6 shadow-2xl"
+        >
           <div class="flex items-center justify-between mb-4">
             <span class="eyebrow">Today's pick</span>
             <span class="bg-flame text-paper text-[10px] font-mono font-semibold uppercase tracking-widest2 px-2.5 py-1 rounded-full">Signature</span>
@@ -95,7 +136,7 @@ const testimonials = [
           <StarRating :rating="spotlight.rating" :reviews="spotlight.reviews" class="mb-3" />
           <p class="text-sm text-charcoal/60 leading-relaxed mb-5">{{ spotlight.desc }}</p>
           <button
-            class="w-full rounded-lg py-3 text-sm font-semibold uppercase tracking-wide font-mono transition-colors"
+            class="ripple w-full rounded-lg py-3 text-sm font-semibold uppercase tracking-wide font-mono transition-all duration-150 active:scale-[0.97]"
             :class="spotlightAdded ? 'bg-basil text-paper' : 'bg-charcoal text-paper hover:bg-flame'"
             @click="addSpotlight"
           >
@@ -108,20 +149,20 @@ const testimonials = [
     <!-- Trust bar -->
     <section class="border-b border-charcoal/10 bg-paper">
       <div class="mx-auto max-w-6xl px-5 sm:px-8 py-8 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center sm:text-left">
-        <div>
-          <p class="font-display font-extrabold text-3xl">4.8</p>
+        <div :ref="(el) => (rating.el.value = el)">
+          <p class="font-display font-extrabold text-3xl tabular-num">{{ rating.display.value.toFixed(1) }}</p>
           <p class="text-xs text-smoke font-mono uppercase tracking-widest2 mt-1">Average rating</p>
         </div>
-        <div>
-          <p class="font-display font-extrabold text-3xl">25k+</p>
+        <div :ref="(el) => (orders.el.value = el)">
+          <p class="font-display font-extrabold text-3xl tabular-num">{{ Math.round(orders.display.value) }}k+</p>
           <p class="text-xs text-smoke font-mono uppercase tracking-widest2 mt-1">Orders served</p>
         </div>
-        <div>
-          <p class="font-display font-extrabold text-3xl">18 min</p>
+        <div :ref="(el) => (kitchenTime.el.value = el)">
+          <p class="font-display font-extrabold text-3xl tabular-num">{{ Math.round(kitchenTime.display.value) }} min</p>
           <p class="text-xs text-smoke font-mono uppercase tracking-widest2 mt-1">Avg. kitchen time</p>
         </div>
-        <div>
-          <p class="font-display font-extrabold text-3xl">3</p>
+        <div :ref="(el) => (locationsCount.el.value = el)">
+          <p class="font-display font-extrabold text-3xl tabular-num">{{ Math.round(locationsCount.display.value) }}</p>
           <p class="text-xs text-smoke font-mono uppercase tracking-widest2 mt-1">City locations</p>
         </div>
       </div>
@@ -129,9 +170,11 @@ const testimonials = [
 
     <!-- Featured strip -->
     <section class="mx-auto max-w-6xl px-5 sm:px-8 py-14 sm:py-16">
-      <span class="eyebrow">Fan favourites</span>
-      <h2 class="font-display font-extrabold text-3xl sm:text-4xl mt-2 mb-8">Where to start</h2>
-      <div class="grid sm:grid-cols-3 gap-6 rise-in">
+      <div v-motion-slide-visible-once-bottom>
+        <span class="eyebrow">Fan favourites</span>
+        <h2 class="font-display font-extrabold text-3xl sm:text-4xl mt-2 mb-8">Where to start</h2>
+      </div>
+      <div class="grid sm:grid-cols-3 gap-6 rise-in" v-motion-fade-visible-once>
         <MenuCard v-for="item in featured" :key="item.id" :item="item" />
       </div>
     </section>
@@ -184,17 +227,17 @@ const testimonials = [
     <!-- Signature strip -->
     <section class="bg-charcoal text-paper py-16">
       <div class="mx-auto max-w-6xl px-5 sm:px-8 grid sm:grid-cols-3 gap-10">
-        <div>
+        <div v-motion :initial="{ opacity: 0, y: 20 }" :visible-once="{ opacity: 1, y: 0, transition: { duration: 500 } }">
           <span class="font-display font-extrabold text-4xl text-flame">01</span>
           <p class="font-semibold mt-3 mb-2">Fire first</p>
           <p class="text-sm text-paper/60 leading-relaxed">Every patty and pie touches open flame before it touches a plate.</p>
         </div>
-        <div>
+        <div v-motion :initial="{ opacity: 0, y: 20 }" :visible-once="{ opacity: 1, y: 0, transition: { duration: 500, delay: 100 } }">
           <span class="font-display font-extrabold text-4xl text-flame">02</span>
           <p class="font-semibold mt-3 mb-2">Made to ticket</p>
           <p class="text-sm text-paper/60 leading-relaxed">Nothing is pre-made. Your order goes straight to the grill the moment you send it.</p>
         </div>
-        <div>
+        <div v-motion :initial="{ opacity: 0, y: 20 }" :visible-once="{ opacity: 1, y: 0, transition: { duration: 500, delay: 200 } }">
           <span class="font-display font-extrabold text-4xl text-flame">03</span>
           <p class="font-semibold mt-3 mb-2">Local, mostly</p>
           <p class="text-sm text-paper/60 leading-relaxed">Produce sourced from growers within a day's drive, whenever we can.</p>
@@ -204,9 +247,11 @@ const testimonials = [
 
     <!-- Testimonials -->
     <section class="mx-auto max-w-6xl px-5 sm:px-8 py-16 sm:py-20">
-      <span class="eyebrow">What people order again</span>
-      <h2 class="font-display font-extrabold text-3xl sm:text-4xl mt-2 mb-10">Straight from the tickets</h2>
-      <div class="grid sm:grid-cols-3 gap-6 rise-in">
+      <div v-motion-slide-visible-once-bottom>
+        <span class="eyebrow">What people order again</span>
+        <h2 class="font-display font-extrabold text-3xl sm:text-4xl mt-2 mb-10">Straight from the tickets</h2>
+      </div>
+      <div class="grid sm:grid-cols-3 gap-6 rise-in" v-motion-fade-visible-once>
         <div v-for="t in testimonials" :key="t.name" class="ticket p-6 flex flex-col">
           <StarRating :rating="5" class="mb-4" />
           <p class="font-accent italic text-charcoal/80 leading-relaxed flex-1">&ldquo;{{ t.quote }}&rdquo;</p>
