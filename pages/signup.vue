@@ -29,15 +29,15 @@ function handleSubmit() {
     <!-- Left: brand panel -->
     <div class="hidden lg:flex flex-col justify-between bg-charcoal text-paper px-14 py-14 relative overflow-hidden">
       <div class="absolute inset-0 bg-grain"></div>
+      <img src="/images/flame-mark.svg" alt="" class="absolute -right-24 -bottom-16 w-96 opacity-20 pointer-events-none" />
       <div class="relative">
         <span class="eyebrow text-ember">Table for one?</span>
-        <h1 class="font-display text-6xl leading-[0.95] mt-4">
-          First,<br />open a<br /><span class="text-flame">tab.</span>
+        <h1 class="font-display font-extrabold text-6xl xl:text-7xl leading-[1.05] mt-5 [text-wrap:balance]">
+          First, open a <span class="text-flame">tab.</span>
         </h1>
       </div>
-      <p class="relative text-paper/60 text-sm max-w-sm leading-relaxed">
-        Every seat in the house starts with a ticket. Create your account and the full
-        menu — burgers, pizza, sides, and the good drinks — is yours to order from.
+      <p class="relative font-accent italic text-paper/70 text-lg max-w-md leading-relaxed">
+        Every seat in the house starts with a ticket. Create your account and the full menu is yours to order from.
       </p>
     </div>
 
@@ -45,7 +45,7 @@ function handleSubmit() {
     <div class="flex items-center justify-center px-6 py-16 sm:py-24">
       <div class="w-full max-w-sm">
         <span class="eyebrow">New here</span>
-        <h2 class="font-display text-4xl mt-2 mb-8">Create your account</h2>
+        <h2 class="font-display font-extrabold text-4xl mt-2 mb-8">Create your account</h2>
 
         <form class="space-y-6" @submit.prevent="handleSubmit">
           <div>
@@ -61,7 +61,7 @@ function handleSubmit() {
             <input id="password" v-model="password" type="password" placeholder="Password (min 4 characters)" class="field" autocomplete="new-password" required />
           </div>
 
-          <p v-if="error" class="text-flame text-sm font-mono">{{ error }}</p>
+          <p v-if="error" class="text-flame text-sm font-medium">{{ error }}</p>
 
           <button type="submit" class="btn-primary w-full" :disabled="loading">
             {{ loading ? 'Opening tab…' : 'Sign up & enter' }}
@@ -74,8 +74,7 @@ function handleSubmit() {
         </p>
 
         <p class="text-xs text-smoke/70 mt-10 leading-relaxed">
-          This demo stores your account in your browser's local storage only — there's
-          no server involved, so it lives on this device and this browser.
+          This demo stores your account in your browser's local storage only. It lives on this device and this browser, with no server involved.
         </p>
       </div>
     </div>

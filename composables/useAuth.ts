@@ -1,6 +1,6 @@
 // Fully client-side auth. Users are stored in localStorage under "cc_users".
 // The active session is stored under "cc_session".
-// NOTE: this is intentionally NOT secure (plaintext, no backend) — it exists
+// NOTE: this is intentionally NOT secure (plaintext, no backend). It exists
 // purely to gate the frontend as requested. Do not reuse this pattern for
 // anything that handles real user data.
 
@@ -8,12 +8,14 @@ interface StoredUser {
   name: string
   email: string
   password: string
+  avatar: string | null
   createdAt: string
 }
 
 interface SessionUser {
   name: string
   email: string
+  avatar: string | null
 }
 
 const USERS_KEY = 'cc_users'
@@ -37,6 +39,11 @@ export function useAuth() {
   const currentUser = useState<SessionUser | null>('cc_current_user', () => null)
   const ready = useState<boolean>('cc_auth_ready', () => false)
 
+  function persistSession(session: SessionUser) {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session))
+    currentUser.value = session
+  }
+
   function init() {
     if (import.meta.server || ready.value) return
     try {
@@ -51,17 +58,15 @@ export function useAuth() {
   function signup(name: string, email: string, password: string): { ok: boolean; error?: string } {
     const cleanEmail = email.trim().toLowerCase()
     if (!name.trim() || !cleanEmail || password.length < 4) {
-      return { ok: false, error: 'Fill in every field — password needs at least 4 characters.' }
+      return { ok: false, error: 'Fill in every field. Password needs at least 4 characters.' }
     }
     const users = readUsers()
     if (users.some((u) => u.email === cleanEmail)) {
       return { ok: false, error: 'An account already exists for that email. Try logging in instead.' }
     }
-    users.push({ name: name.trim(), email: cleanEmail, password, createdAt: new Date().toISOString() })
+    users.push({ name: name.trim(), email: cleanEmail, password, avatar: null, createdAt: new Date().toISOString() })
     writeUsers(users)
-    const session: SessionUser = { name: name.trim(), email: cleanEmail }
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session))
-    currentUser.value = session
+    persistSession({ name: name.trim(), email: cleanEmail, avatar: null })
     return { ok: true }
   }
 
@@ -72,9 +77,7 @@ export function useAuth() {
     if (!found) {
       return { ok: false, error: 'No account matches that email and password.' }
     }
-    const session: SessionUser = { name: found.name, email: found.email }
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session))
-    currentUser.value = session
+    persistSession({ name: found.name, email: found.email, avatar: found.avatar })
     return { ok: true }
   }
 
@@ -83,5 +86,41 @@ export function useAuth() {
     currentUser.value = null
   }
 
-  return { currentUser, ready, init, signup, login, logout }
+  function updateProfile(updates: { name?: string; avatar?: string | null }): { ok: boolean; error?: string } {
+    if (!currentUser.value) return { ok: false, error: 'You need to be logged in.' }
+    const cleanName = updates.name?.trim()
+    if (updates.name !== undefined && !cleanName) {
+      return { ok: false, error: 'Name cannot be empty.' }
+    }
+    const users = readUsers()
+    const idx = users.findIndex((u) => u.email === currentUser.value!.email)
+    if (idx === -1) return { ok: false, error: 'Account not found.' }
+
+    if (cleanName) users[idx].name = cleanName
+    if (updates.avatar !== undefined) users[idx].avatar = updates.avatar
+    writeUsers(users)
+
+    persistSession({
+      name: users[idx].name,
+      email: users[idx].email,
+      avatar: users[idx].avatar
+    })
+    return { ok: true }
+  }
+
+  function changePassword(currentPassword: string, newPassword: string): { ok: boolean; error?: string } {
+    if (!currentUser.value) return { ok: false, error: 'You need to be logged in.' }
+    if (newPassword.length < 4) return { ok: false, error: 'New password needs at least 4 characters.' }
+    const users = readUsers()
+    const idx = users.findIndex((u) => u.email === currentUser.value!.email)
+    if (idx === -1) return { ok: false, error: 'Account not found.' }
+    if (users[idx].password !== currentPassword) {
+      return { ok: false, error: 'Current password is incorrect.' }
+    }
+    users[idx].password = newPassword
+    writeUsers(users)
+    return { ok: true }
+  }
+
+  return { currentUser, ready, init, signup, login, logout, updateProfile, changePassword }
 }

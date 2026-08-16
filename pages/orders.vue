@@ -15,10 +15,10 @@ function formatDate(iso: string) {
 <template>
   <div class="mx-auto max-w-3xl px-5 sm:px-8 pt-16 pb-24 sm:pt-24">
     <span class="eyebrow">Past tickets</span>
-    <h1 class="font-display text-5xl sm:text-6xl mt-4 mb-10 leading-[0.95]">Order history.</h1>
+    <h1 class="font-display font-extrabold text-5xl sm:text-6xl mt-4 mb-10 leading-[1.05]">Order history.</h1>
 
     <div v-if="orders.length === 0" class="ticket p-10 text-center">
-      <p class="text-charcoal/60 text-sm">No orders fired yet — head to the menu and build your first ticket.</p>
+      <p class="text-charcoal/60 text-sm">No orders fired yet. Head to the menu and build your first ticket.</p>
       <NuxtLink to="/" class="btn-outline mt-6 inline-flex">Browse menu</NuxtLink>
     </div>
 
