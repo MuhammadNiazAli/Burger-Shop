@@ -1,43 +1,67 @@
-# Burger Shop. Nuxt 3 Restaurant Frontend. No Backend.
+# Burger Shop — Nuxt 3 Restaurant Frontend
 
-This is a fully frontend Nuxt 3 project. There is no backend API or database. Signup and login are both saved in localStorage inside the browser.
+A fully client-side Nuxt 3 ordering experience for a fictional burger & pizza restaurant. There is **no backend, no API, and no database** — every account, cart, order, and favorite lives entirely in the browser's `localStorage`.
 
-## How to run
+## Tech stack
+
+- **Nuxt 3** with the Vue 3 Composition API
+- **Tailwind CSS** (via `@nuxtjs/tailwindcss`) with a custom design system — colors, type scale, and a signature "kitchen ticket" component style
+- No external UI library, state manager, or backend dependency
+
+## Getting started
 
 ```bash
 npm install
 npm run dev
 ```
 
-Then open your browser at `http://localhost:3000`.
+Then open `http://localhost:3000`.
 
 ## How it works
 
-The first time the site opens it redirects straight to the signup page. Until an account is created no other page can be reached. This gate lives in `middleware/auth.global.ts` and it is strict. Once someone is logged in they cannot go back to the signup or login pages either. They stay locked in until they sign out.
+### Authentication gate
 
-Signup in `pages/signup.vue` saves a new account to localStorage under the key `cc_users` and logs the person in right away.
+The first visit redirects straight to `/signup`. No other route is reachable until an account exists. This gate is enforced by `middleware/auth.global.ts`, which re-checks every navigation — including direct URL entry, refreshes, and browser back/forward — so a protected route never flashes into view unauthenticated. Once a session exists, `/login` and `/signup` themselves become unreachable until the person signs out.
 
-Login in `pages/login.vue` checks the saved account and starts a new session.
+- **Sign up** (`pages/signup.vue`) creates an account in `localStorage` under `cc_users` and starts a session immediately.
+- **Log in** (`pages/login.vue`) validates against the saved accounts and starts a new session.
+- **Sign out** is available from the navbar (desktop and mobile) and the profile page, and always asks for confirmation before clearing the session key `cc_session`.
 
-Profile in `pages/profile.vue` lets someone upload an avatar, edit their name, and change their password.
+> This is a demo authentication gate only. Passwords are stored in plain text with no encryption. A production app needs a real backend with hashed credentials and server-side session handling.
 
-Sign out is available from the navbar and from the mobile menu. It clears the session key `cc_session`.
+### Ordering flow
 
-The menu, cart, and order history all live in localStorage as well, through the composables `useAuth.ts`, `useCart.ts`, and `useOrders.ts`.
+- **Menu** (`pages/index.vue`) — browse by category, search, and sort by popularity, rating, or price, backed by `data/menu.ts`.
+- **Cart** (`composables/useCart.ts`, `components/CartDrawer.vue`) — add, adjust quantity, and remove items from a slide-out drawer.
+- **Checkout** (`pages/checkout.vue`) — collect a delivery address and payment method, then place the order.
+- **Order history** (`pages/orders.vue`, `composables/useOrders.ts`) — past orders with a live, time-based delivery status tracker and one-tap reorder.
+- **Favorites** (`pages/favorites.vue`, `composables/useFavorites.ts`) — save items from any menu card for quick access later.
+- **Profile** (`pages/profile.vue`) — update name, avatar, and password.
 
-This is a demo authentication gate only. Passwords are saved in plain text in localStorage with no encryption and no real security. A real product needs a proper backend with hashed passwords.
+### Live menu photography
+
+`composables/useFoodImages.ts` fetches real food photos at runtime from two free, keyless public APIs — [Foodish](https://foodish-api.com) for burgers/pizza/sides and [TheCocktailDB](https://www.thecocktaildb.com) for drinks — and caches the result per item in `localStorage` so each item keeps the same photo across visits.
+
+### Feedback & confirmation
+
+Every meaningful action (adding to cart, placing an order, saving a profile change, signing out, etc.) surfaces a toast notification via `composables/useToast.ts` and `components/ToastStack.vue`. Destructive or hard-to-undo actions — signing out, removing a saved photo — go through a confirmation dialog via `composables/useConfirm.ts` and `components/ConfirmModal.vue` before anything happens.
 
 ## Project structure
 
 ```
-components/     Navbar, Footer, MenuCard, CartDrawer, StarRating, PromoBar
-composables/    useAuth, useCart, useOrders, all localStorage backed
+components/     Navbar, Footer, MenuCard, CartDrawer, StarRating, PromoBar,
+                ToastStack, ConfirmModal
+composables/    useAuth, useCart, useOrders, useFavorites, useFoodImages,
+                useToast, useConfirm — all state is localStorage-backed
+                where it needs to persist
 data/menu.ts    Menu items across Burgers, Pizza, Sides, and Drinks
-middleware/     auth.global.ts, the signup and login gate
-pages/          signup, login, index (menu), about, orders, profile, contact, locations
+middleware/     auth.global.ts — the signup/login gate
+pages/          index (menu), signup, login, checkout, orders, favorites,
+                profile, about, careers, contact, locations, press,
+                privacy, terms
 layouts/        default.vue
 public/images/  Custom SVG illustrations used across the site
-assets/css/     Tailwind and design tokens
+assets/css/     Tailwind entry point and design tokens
 ```
 
 ## Build for production
