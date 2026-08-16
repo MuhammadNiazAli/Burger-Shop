@@ -1,43 +1,43 @@
-# Char & Crust — Nuxt 3 Restaurant Frontend (No Backend)
+# Burger Shop. Nuxt 3 Restaurant Frontend. No Backend.
 
-Ye ek pura frontend-only Nuxt 3 project hai. Koi backend / API / database nahi hai —
-signup aur login dono **localStorage** mein save hote hain, sirf browser ke andar.
+This is a fully frontend Nuxt 3 project. There is no backend API or database. Signup and login are both saved in localStorage inside the browser.
 
-## Kaise chalayen (How to run)
+## How to run
 
 ```bash
 npm install
 npm run dev
 ```
 
-Phir browser mein kholain: `http://localhost:3000`
+Then open your browser at `http://localhost:3000`.
 
-## Kaise kaam karta hai (How it works)
+## How it works
 
-- **Pehli baar site kholenge** to seedha `/signup` page par redirect ho jayenge —
-  jab tak signup nahi karte, koi aur page (menu, about, orders) access nahi ho sakta.
-  Ye gate `middleware/auth.global.ts` mein hai.
-- **Signup** (`pages/signup.vue`) → naya account `localStorage` (`cc_users`) mein
-  save hota hai aur turant login ho jata hai.
-- **Login** (`pages/login.vue`) → pehle se bane account se dobara login.
-- **Sign out** navbar ke button se — session (`cc_session`) clear ho jata hai.
-- **Menu / Cart / Orders** sab kuch bhi `localStorage` use karta hai
-  (`composables/useAuth.ts`, `useCart.ts`, `useOrders.ts`).
+The first time the site opens it redirects straight to the signup page. Until an account is created no other page can be reached. This gate lives in `middleware/auth.global.ts` and it is strict. Once someone is logged in they cannot go back to the signup or login pages either. They stay locked in until they sign out.
 
-> Note: Ye sirf ek demo/frontend gate hai — password plaintext localStorage mein
-> save hota hai, koi encryption ya real security nahi hai. Real product ke liye
-> proper backend + hashed passwords zaroori hain.
+Signup in `pages/signup.vue` saves a new account to localStorage under the key `cc_users` and logs the person in right away.
+
+Login in `pages/login.vue` checks the saved account and starts a new session.
+
+Profile in `pages/profile.vue` lets someone upload an avatar, edit their name, and change their password.
+
+Sign out is available from the navbar and from the mobile menu. It clears the session key `cc_session`.
+
+The menu, cart, and order history all live in localStorage as well, through the composables `useAuth.ts`, `useCart.ts`, and `useOrders.ts`.
+
+This is a demo authentication gate only. Passwords are saved in plain text in localStorage with no encryption and no real security. A real product needs a proper backend with hashed passwords.
 
 ## Project structure
 
 ```
-components/     Navbar, Footer, MenuCard (ticket-style), CartDrawer
-composables/    useAuth, useCart, useOrders — sab localStorage-backed
-data/menu.ts    Menu items (Burgers, Pizza, Sides, Drinks)
-middleware/     auth.global.ts — signup/login gate
-pages/          signup.vue, login.vue, index.vue (menu), about.vue, orders.vue
+components/     Navbar, Footer, MenuCard, CartDrawer, StarRating, PromoBar
+composables/    useAuth, useCart, useOrders, all localStorage backed
+data/menu.ts    Menu items across Burgers, Pizza, Sides, and Drinks
+middleware/     auth.global.ts, the signup and login gate
+pages/          signup, login, index (menu), about, orders, profile, contact, locations
 layouts/        default.vue
-assets/css/     Tailwind + design tokens
+public/images/  Custom SVG illustrations used across the site
+assets/css/     Tailwind and design tokens
 ```
 
 ## Build for production
