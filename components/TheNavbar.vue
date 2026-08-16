@@ -20,8 +20,6 @@ watch(count, (val, prev) => {
   })
 })
 
-// Close any open overlay the instant a navigation starts, not after it
-// resolves — avoids the drawer/backdrop briefly intercepting the next click.
 router.beforeEach(() => {
   mobileOpen.value = false
   cartOpen.value = false

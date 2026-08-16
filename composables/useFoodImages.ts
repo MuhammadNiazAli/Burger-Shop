@@ -1,13 +1,3 @@
-// Pulls real food photography from free, keyless public APIs so the menu
-// never looks like it's using stock icons:
-//  - Foodish (https://foodish-api.com) for burgers / pizza / sides — thousands
-//    of real fast-food photos served randomly per category.
-//  - TheCocktailDB (https://www.thecocktaildb.com) for drinks — a large open
-//    database of real drink photography.
-// Results are cached in localStorage per menu-item id so a given item keeps
-// the same photo across visits, while still being a genuine live network
-// fetch (not a bundled asset) the first time it's needed.
-
 type ImgCache = Record<string, string>
 
 const CACHE_KEY = 'cc_img_cache_v1'
@@ -28,7 +18,6 @@ export function useFoodImages() {
       const raw = localStorage.getItem(CACHE_KEY)
       if (raw) cache.value = { ...JSON.parse(raw), ...cache.value }
     } catch {
-      // ignore corrupt cache
     }
     loaded.value = true
   }
@@ -38,7 +27,6 @@ export function useFoodImages() {
     try {
       localStorage.setItem(CACHE_KEY, JSON.stringify(cache.value))
     } catch {
-      // storage full or unavailable — safe to ignore, cache stays in memory
     }
   }
 
@@ -66,8 +54,6 @@ export function useFoodImages() {
     }
   }
 
-  /** Resolve (and cache) a real photo for a menu item. Falls back to the
-   * bundled SVG icon if the network call fails for any reason. */
   async function resolveImage(itemId: string, category: string, fallback: string): Promise<string> {
     loadCache()
     if (cache.value[itemId]) return cache.value[itemId]

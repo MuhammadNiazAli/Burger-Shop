@@ -1,8 +1,3 @@
-// Toast notifications are now powered by vue-sonner (rendered via <Toaster />
-// in app.vue, themed in main.css under the [data-sonner-toaster] block).
-// The success/error/info API below is kept identical to before so every
-// existing call site (MenuCard, TheNavbar, CartDrawer, checkout, login, ...)
-// needs zero changes.
 import { toast as sonnerToast } from 'vue-sonner'
 
 export type ToastType = 'success' | 'error' | 'info'

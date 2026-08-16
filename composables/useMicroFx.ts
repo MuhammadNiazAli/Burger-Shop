@@ -1,9 +1,3 @@
-// Small, dependency-free micro-interaction helpers used across buttons and cards.
-// Kept separate from the animation library (@vueuse/motion handles scroll/tap
-// reveals) since these three are cheap, one-off DOM effects that don't need
-// a full motion engine.
-
-/** Spawns a ripple dot at the pointer position inside the clicked element. */
 export function spawnRipple(e: MouseEvent | PointerEvent) {
   if (import.meta.server) return
   const target = e.currentTarget as HTMLElement
@@ -20,7 +14,6 @@ export function spawnRipple(e: MouseEvent | PointerEvent) {
   dot.addEventListener('animationend', () => dot.remove())
 }
 
-/** Attaches a gentle magnetic pull toward the cursor. Call on pointermove/pointerleave. */
 export function useMagnetic(strength = 10) {
   function onPointerMove(e: PointerEvent) {
     const target = e.currentTarget as HTMLElement
@@ -38,7 +31,6 @@ export function useMagnetic(strength = 10) {
   return { onPointerMove, onPointerLeave }
 }
 
-/** Animates a number counting up from 0 whenever it scrolls into view (once). */
 export function useCountUp(target: number, duration = 1200) {
   const display = ref(0)
   const el = ref<Element | null>(null)

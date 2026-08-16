@@ -14,8 +14,6 @@ const heartBounce = ref(false)
 
 const cardEl = ref<HTMLElement | null>(null)
 
-// Subtle tilt toward the cursor — capped small so it reads as "premium",
-// not gimmicky, and is fully skipped for prefers-reduced-motion via CSS.
 function handleTilt(e: PointerEvent) {
   if (!cardEl.value) return
   const rect = cardEl.value.getBoundingClientRect()

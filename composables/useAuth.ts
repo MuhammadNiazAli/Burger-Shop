@@ -1,9 +1,3 @@
-// Fully client-side auth. Users are stored in localStorage under "cc_users".
-// The active session is stored under "cc_session".
-// NOTE: this is intentionally NOT secure (plaintext, no backend). It exists
-// purely to gate the frontend as requested. Do not reuse this pattern for
-// anything that handles real user data.
-
 interface StoredUser {
   name: string
   email: string

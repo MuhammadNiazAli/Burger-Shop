@@ -38,7 +38,6 @@ function addSpotlight() {
   setTimeout(() => (spotlightAdded.value = false), 900)
 }
 
-// Trust-bar numbers count up into view instead of appearing static.
 const rating = useCountUp(4.8)
 const orders = useCountUp(25)
 const kitchenTime = useCountUp(18)

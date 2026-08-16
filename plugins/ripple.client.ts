@@ -1,6 +1,3 @@
-// Global, delegated ripple effect for every .btn-primary / .btn-outline /
-// .ripple element site-wide — added once here instead of wiring a handler
-// into every page that has a button, so new buttons get it for free.
 export default defineNuxtPlugin(() => {
   if (import.meta.server) return
 

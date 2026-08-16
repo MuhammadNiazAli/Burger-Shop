@@ -9,8 +9,6 @@ const toast = useToast()
 
 onMounted(() => load())
 
-// Tick every second so in-progress orders visibly move through their
-// delivery stages without needing a page refresh.
 const now = ref(Date.now())
 let timer: ReturnType<typeof setInterval> | undefined
 onMounted(() => {
