@@ -1,12 +1,14 @@
 # Burger Shop — Nuxt 3 Restaurant Frontend
 
-A fully client-side Nuxt 3 ordering experience for a fictional burger & pizza restaurant. There is **no backend, no API, and no database** — every account, cart, order, and favorite lives entirely in the browser's `localStorage`.
+A fully client-side Nuxt 3 ordering experience for a fictional burger & pizza restaurant, with a "kitchen ticket" design language, scroll-driven motion, and polished micro-interactions throughout. There is **no backend, no API, and no database** — every account, cart, order, and favorite lives entirely in the browser's `localStorage`.
 
 ## Tech stack
 
 - **Nuxt 3** with the Vue 3 Composition API
 - **Tailwind CSS** (via `@nuxtjs/tailwindcss`) with a custom design system — colors, type scale, and a signature "kitchen ticket" component style
-- No external UI library, state manager, or backend dependency
+- **[@vueuse/motion](https://motion.vueuse.org/)** — scroll-triggered reveals and staggered entrance animations (hero, trust bar, testimonials, "why us" strip)
+- **[vue-sonner](https://vue-sonner.vercel.app/)** — toast notifications, themed to match the paper/ticket aesthetic
+- No external state manager or backend dependency
 
 ## Getting started
 
@@ -42,26 +44,39 @@ The first visit redirects straight to `/signup`. No other route is reachable unt
 
 `composables/useFoodImages.ts` fetches real food photos at runtime from two free, keyless public APIs — [Foodish](https://foodish-api.com) for burgers/pizza/sides and [TheCocktailDB](https://www.thecocktaildb.com) for drinks — and caches the result per item in `localStorage` so each item keeps the same photo across visits.
 
+### Motion & micro-interactions
+
+- **Scroll-triggered reveals** — the homepage hero, trust bar, "why us" strip, and testimonials fade/slide into view via `@vueuse/motion` (`v-motion`, `v-motion-slide-visible-once-bottom`, `v-motion-fade-visible-once`), instead of animating once on page load regardless of scroll position.
+- **Count-up stats** — the trust-bar numbers (rating, orders served, kitchen time, locations) animate up from zero the moment they scroll into view, via `composables/useMicroFx.ts` (`useCountUp`).
+- **Ripple feedback** — every `.btn-primary` / `.btn-outline` button gets a pointer-position ripple on click, applied globally via `plugins/ripple.client.ts` (no per-page wiring needed).
+- **Card tilt & shine** — `components/MenuCard.vue` tilts subtly toward the cursor and sweeps a light shine across the product photo on hover.
+- **Magnetic CTA** — the hero "View the menu" button nudges toward the cursor (`useMagnetic` in `useMicroFx.ts`).
+- **Cart badge pop** — the navbar cart count pops with a spring animation whenever it changes.
+- All animations respect `prefers-reduced-motion`.
+
 ### Feedback & confirmation
 
-Every meaningful action (adding to cart, placing an order, saving a profile change, signing out, etc.) surfaces a toast notification via `composables/useToast.ts` and `components/ToastStack.vue`. Destructive or hard-to-undo actions — signing out, removing a saved photo — go through a confirmation dialog via `composables/useConfirm.ts` and `components/ConfirmModal.vue` before anything happens.
+Every meaningful action (adding to cart, placing an order, saving a profile change, signing out, etc.) surfaces a toast notification via `composables/useToast.ts`, rendered by `vue-sonner`'s `<Toaster />` (mounted in `app.vue`) and themed in `assets/css/main.css` to read as a kitchen ticket rather than a stock toast. Destructive or hard-to-undo actions — signing out, removing a saved photo — go through a confirmation dialog via `composables/useConfirm.ts` and `components/ConfirmModal.vue` before anything happens.
 
 ## Project structure
 
 ```
 components/     Navbar, Footer, MenuCard, CartDrawer, StarRating, PromoBar,
-                ToastStack, ConfirmModal
+                ConfirmModal
 composables/    useAuth, useCart, useOrders, useFavorites, useFoodImages,
-                useToast, useConfirm — all state is localStorage-backed
-                where it needs to persist
+                useToast, useConfirm, useMicroFx (ripple, magnetic hover,
+                count-up) — all state is localStorage-backed where it
+                needs to persist
 data/menu.ts    Menu items across Burgers, Pizza, Sides, and Drinks
 middleware/     auth.global.ts — the signup/login gate
+plugins/        ripple.client.ts — global button ripple effect
 pages/          index (menu), signup, login, checkout, orders, favorites,
                 profile, about, careers, contact, locations, press,
                 privacy, terms
 layouts/        default.vue
 public/images/  Custom SVG illustrations used across the site
-assets/css/     Tailwind entry point and design tokens
+assets/css/     Tailwind entry point, design tokens, and micro-interaction
+                utility classes (ripple, tilt, shine, glow, toast theming)
 ```
 
 ## Build for production
