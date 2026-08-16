@@ -2,17 +2,18 @@
 const { currentUser, logout } = useAuth()
 const { count, load } = useCart()
 const route = useRoute()
+const router = useRouter()
 const cartOpen = ref(false)
 const mobileOpen = ref(false)
 
 onMounted(() => load())
 
-watch(
-  () => route.path,
-  () => {
-    mobileOpen.value = false
-  }
-)
+// Close any open overlay the instant a navigation starts, not after it
+// resolves — avoids the drawer/backdrop briefly intercepting the next click.
+router.beforeEach(() => {
+  mobileOpen.value = false
+  cartOpen.value = false
+})
 
 const navLinks = [
   { to: '/', label: 'Menu' },

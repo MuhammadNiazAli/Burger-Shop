@@ -52,10 +52,10 @@ function subscribe() {
       <div class="font-mono text-xs uppercase tracking-widest2 text-paper/50">
         <p class="text-paper mb-4 tracking-wide">Company</p>
         <ul class="space-y-3 normal-case font-body text-sm text-paper/70">
-          <li><a href="#" class="hover:text-ember transition-colors">Careers</a></li>
-          <li><a href="#" class="hover:text-ember transition-colors">Press</a></li>
-          <li><a href="#" class="hover:text-ember transition-colors">Terms of service</a></li>
-          <li><a href="#" class="hover:text-ember transition-colors">Privacy policy</a></li>
+          <li><NuxtLink to="/careers" class="hover:text-ember transition-colors">Careers</NuxtLink></li>
+          <li><NuxtLink to="/press" class="hover:text-ember transition-colors">Press</NuxtLink></li>
+          <li><NuxtLink to="/terms" class="hover:text-ember transition-colors">Terms of service</NuxtLink></li>
+          <li><NuxtLink to="/privacy" class="hover:text-ember transition-colors">Privacy policy</NuxtLink></li>
         </ul>
       </div>
 
