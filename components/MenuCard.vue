@@ -3,7 +3,18 @@ import type { MenuItem } from '~/data/menu'
 
 const props = defineProps<{ item: MenuItem }>()
 const { add } = useCart()
+const { resolveImage } = useFoodImages()
+const { isFavorite, toggle, load: loadFavorites } = useFavorites()
+
 const justAdded = ref(false)
+const photo = ref<string | null>(null)
+const photoLoading = ref(true)
+
+onMounted(async () => {
+  loadFavorites()
+  photo.value = await resolveImage(props.item.id, props.item.category, props.item.image)
+  photoLoading.value = false
+})
 
 function handleAdd() {
   add(props.item)
@@ -14,11 +25,30 @@ function handleAdd() {
 
 <template>
   <article class="group bg-white border border-charcoal/10 rounded-xl overflow-hidden flex flex-col h-full transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_-16px_rgba(28,23,18,0.25)] hover:border-charcoal/20">
-    <div class="relative bg-[#F1ECDF] h-40 flex items-center justify-center overflow-hidden">
-      <span v-if="item.tag" class="absolute top-3 left-3 bg-charcoal text-paper text-[10px] font-mono font-semibold uppercase tracking-widest2 px-2.5 py-1 rounded-full">
+    <div class="relative bg-[#F1ECDF] h-44 overflow-hidden">
+      <span v-if="item.tag" class="absolute top-3 left-3 z-10 bg-charcoal text-paper text-[10px] font-mono font-semibold uppercase tracking-widest2 px-2.5 py-1 rounded-full">
         {{ item.tag }}
       </span>
-      <img :src="item.image" :alt="item.name" class="h-28 w-28 object-contain transition-transform duration-300 group-hover:scale-110" />
+
+      <button
+        class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-paper/90 backdrop-blur flex items-center justify-center transition-colors"
+        :aria-label="isFavorite(item.id) ? 'Remove from favorites' : 'Add to favorites'"
+        @click="toggle(item.id)"
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" :fill="isFavorite(item.id) ? '#E3572A' : 'none'" stroke="currentColor" stroke-width="2" :class="isFavorite(item.id) ? 'text-flame' : 'text-charcoal/50'">
+          <path d="M20.8 8.6a5.5 5.5 0 0 0-9.4-3.9L12 5.3l-.6-.6A5.5 5.5 0 0 0 3.2 8.6c0 1.5.6 2.9 1.6 3.9l6.6 6.6a.9.9 0 0 0 1.3 0l6.6-6.6c1-1 1.6-2.4 1.6-3.9Z"/>
+        </svg>
+      </button>
+
+      <div v-if="photoLoading" class="absolute inset-0 animate-pulse bg-charcoal/5"></div>
+      <img
+        v-else
+        :src="photo || item.image"
+        :alt="item.name"
+        loading="lazy"
+        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        @error="photo = item.image"
+      />
     </div>
 
     <div class="p-5 flex flex-col flex-1">

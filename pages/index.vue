@@ -3,11 +3,30 @@ import { menu, categories } from '~/data/menu'
 
 const { currentUser } = useAuth()
 const { add } = useCart()
+const { resolveImage } = useFoodImages()
 const activeCategory = ref<typeof categories[number]>('Burgers')
+const search = ref('')
+const sortBy = ref<'popular' | 'price-asc' | 'price-desc' | 'rating'>('popular')
 
-const filtered = computed(() => menu.filter((m) => m.category === activeCategory.value))
+const filtered = computed(() => {
+  let list = menu.filter((m) => m.category === activeCategory.value)
+  if (search.value.trim()) {
+    const q = search.value.trim().toLowerCase()
+    list = list.filter((m) => m.name.toLowerCase().includes(q) || m.desc.toLowerCase().includes(q))
+  }
+  const sorted = [...list]
+  if (sortBy.value === 'price-asc') sorted.sort((a, b) => a.price - b.price)
+  else if (sortBy.value === 'price-desc') sorted.sort((a, b) => b.price - a.price)
+  else if (sortBy.value === 'rating') sorted.sort((a, b) => b.rating - a.rating)
+  else sorted.sort((a, b) => b.reviews - a.reviews)
+  return sorted
+})
 const featured = computed(() => menu.filter((m) => m.tag === 'Signature'))
 const spotlight = menu.find((m) => m.id === 'b1')!
+const spotlightPhoto = ref(spotlight.image)
+onMounted(async () => {
+  spotlightPhoto.value = await resolveImage(spotlight.id, spotlight.category, spotlight.image)
+})
 
 const spotlightAdded = ref(false)
 function addSpotlight() {
@@ -64,8 +83,8 @@ const testimonials = [
             <span class="eyebrow">Today's pick</span>
             <span class="bg-flame text-paper text-[10px] font-mono font-semibold uppercase tracking-widest2 px-2.5 py-1 rounded-full">Signature</span>
           </div>
-          <div class="bg-[#F1ECDF] rounded-xl h-44 flex items-center justify-center mb-4">
-            <img :src="spotlight.image" :alt="spotlight.name" class="h-32 w-32 object-contain" />
+          <div class="bg-[#F1ECDF] rounded-xl h-44 overflow-hidden mb-4">
+            <img :src="spotlightPhoto" :alt="spotlight.name" class="w-full h-full object-cover" />
           </div>
           <div class="flex items-start justify-between gap-3 mb-1.5">
             <h2 class="font-display font-bold text-2xl tracking-tight">{{ spotlight.name }}</h2>
@@ -117,22 +136,45 @@ const testimonials = [
 
     <!-- Category strip -->
     <section id="menu" class="sticky top-[116px] z-30 bg-paper/95 backdrop-blur border-y border-charcoal/10">
-      <div class="mx-auto max-w-6xl px-5 sm:px-8 flex gap-8 overflow-x-auto py-5 font-mono text-xs uppercase tracking-widest2">
-        <button
-          v-for="cat in categories"
-          :key="cat"
-          class="whitespace-nowrap pb-1 border-b-2 transition-colors"
-          :class="activeCategory === cat ? 'border-flame text-flame' : 'border-transparent text-charcoal/50 hover:text-charcoal'"
-          @click="activeCategory = cat"
-        >
-          {{ cat }}
-        </button>
+      <div class="mx-auto max-w-6xl px-5 sm:px-8 flex flex-wrap items-center gap-x-8 gap-y-3 overflow-x-auto py-5 font-mono text-xs uppercase tracking-widest2">
+        <div class="flex gap-8">
+          <button
+            v-for="cat in categories"
+            :key="cat"
+            class="whitespace-nowrap pb-1 border-b-2 transition-colors"
+            :class="activeCategory === cat ? 'border-flame text-flame' : 'border-transparent text-charcoal/50 hover:text-charcoal'"
+            @click="activeCategory = cat"
+          >
+            {{ cat }}
+          </button>
+        </div>
+
+        <div class="ml-auto flex items-center gap-3 normal-case tracking-normal">
+          <div class="relative">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3 top-1/2 -translate-y-1/2 text-smoke"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <input
+              v-model="search"
+              type="search"
+              placeholder="Search the menu"
+              class="bg-white border border-charcoal/15 rounded-full pl-8 pr-3 py-2 text-sm w-40 sm:w-52 focus:border-flame outline-none transition-colors"
+            />
+          </div>
+          <select v-model="sortBy" class="bg-white border border-charcoal/15 rounded-full px-3 py-2 text-sm focus:border-flame outline-none transition-colors">
+            <option value="popular">Most popular</option>
+            <option value="rating">Top rated</option>
+            <option value="price-asc">Price: low to high</option>
+            <option value="price-desc">Price: high to low</option>
+          </select>
+        </div>
       </div>
     </section>
 
     <!-- Menu grid -->
     <section class="mx-auto max-w-6xl px-5 sm:px-8 py-14 sm:py-20">
-      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-if="filtered.length === 0" class="ticket p-10 text-center">
+        <p class="text-charcoal/60 text-sm">Nothing matches "{{ search }}" in {{ activeCategory }}. Try another search.</p>
+      </div>
+      <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <MenuCard v-for="item in filtered" :key="item.id" :item="item" />
       </div>
     </section>

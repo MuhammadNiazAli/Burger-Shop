@@ -16,6 +16,7 @@ watch(
 
 const navLinks = [
   { to: '/', label: 'Menu' },
+  { to: '/favorites', label: 'Favorites' },
   { to: '/about', label: 'Kitchen' },
   { to: '/locations', label: 'Locations' },
   { to: '/orders', label: 'Order History' }

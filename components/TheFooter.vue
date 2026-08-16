@@ -41,6 +41,7 @@ function subscribe() {
         <p class="text-paper mb-4 tracking-wide">Explore</p>
         <ul class="space-y-3 normal-case font-body text-sm text-paper/70">
           <li><NuxtLink to="/" class="hover:text-ember transition-colors">Full menu</NuxtLink></li>
+          <li><NuxtLink to="/favorites" class="hover:text-ember transition-colors">Favorites</NuxtLink></li>
           <li><NuxtLink to="/about" class="hover:text-ember transition-colors">Our kitchen</NuxtLink></li>
           <li><NuxtLink to="/locations" class="hover:text-ember transition-colors">Locations</NuxtLink></li>
           <li><NuxtLink to="/orders" class="hover:text-ember transition-colors">Order history</NuxtLink></li>

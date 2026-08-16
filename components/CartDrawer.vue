@@ -1,21 +1,11 @@
 <script setup lang="ts">
 const emit = defineEmits(['close'])
-const { lines, add, decrease, remove, clear, total } = useCart()
-const { record } = useOrders()
-const placed = ref(false)
+const { lines, add, decrease, total } = useCart()
 
-function placeOrder() {
+function goToCheckout() {
   if (lines.value.length === 0) return
-  record(
-    lines.value.map((l) => ({ name: l.name, qty: l.qty, price: l.price })),
-    total.value
-  )
-  placed.value = true
-  setTimeout(() => {
-    clear()
-    placed.value = false
-    emit('close')
-  }, 1800)
+  emit('close')
+  navigateTo('/checkout')
 }
 </script>
 
@@ -29,12 +19,7 @@ function placeOrder() {
     </div>
 
     <div class="flex-1 overflow-y-auto px-6 py-6">
-      <div v-if="placed" class="text-center py-16">
-        <p class="font-display font-extrabold text-3xl text-flame mb-2">Order Fired!</p>
-        <p class="text-sm text-smoke">It's heading to the grill now.</p>
-      </div>
-
-      <div v-else-if="lines.length === 0" class="text-center py-16">
+      <div v-if="lines.length === 0" class="text-center py-16">
         <p class="text-smoke text-sm">Your ticket is empty. Add something from the menu.</p>
       </div>
 
@@ -53,13 +38,13 @@ function placeOrder() {
       </ul>
     </div>
 
-    <div v-if="!placed" class="border-t border-charcoal/10 px-6 py-6">
+    <div class="border-t border-charcoal/10 px-6 py-6">
       <div class="flex items-center justify-between font-mono text-sm mb-4">
         <span class="uppercase tracking-widest2 text-smoke">Total</span>
         <span class="text-lg font-semibold">${{ total.toFixed(2) }}</span>
       </div>
-      <button class="btn-primary w-full" :disabled="lines.length === 0" :class="lines.length === 0 && 'opacity-40 cursor-not-allowed'" @click="placeOrder">
-        Fire the Order
+      <button class="btn-primary w-full" :disabled="lines.length === 0" :class="lines.length === 0 && 'opacity-40 cursor-not-allowed'" @click="goToCheckout">
+        Proceed to checkout
       </button>
     </div>
   </aside>

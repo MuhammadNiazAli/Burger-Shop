@@ -54,6 +54,10 @@
     @apply w-full bg-transparent border-b-2 border-charcoal/20 px-1 py-3 font-body text-charcoal placeholder:text-smoke focus:border-flame outline-none transition-colors;
   }
 
+  .skeleton {
+    @apply animate-pulse bg-charcoal/5;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     * {
       animation-duration: 0.001ms !important;
