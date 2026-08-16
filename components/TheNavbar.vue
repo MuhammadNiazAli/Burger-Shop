@@ -1,6 +1,8 @@
 <script setup lang="ts">
 const { currentUser, logout } = useAuth()
 const { count, load } = useCart()
+const { ask } = useConfirm()
+const toast = useToast()
 const route = useRoute()
 const router = useRouter()
 const cartOpen = ref(false)
@@ -23,9 +25,18 @@ const navLinks = [
   { to: '/orders', label: 'Order History' }
 ]
 
-function doLogout() {
+async function doLogout() {
   mobileOpen.value = false
+  const confirmed = await ask({
+    title: 'Sign out of Burger Shop?',
+    message: 'Your account, ticket and order history stay saved for next time — you\'ll just need to log back in.',
+    confirmLabel: 'Sign out',
+    cancelLabel: 'Stay logged in',
+    tone: 'danger'
+  })
+  if (!confirmed) return
   logout()
+  toast.success('Signed out', 'Come back hungry.')
   navigateTo('/login', { replace: true })
 }
 </script>
@@ -90,7 +101,10 @@ function doLogout() {
     <!-- Mobile drawer -->
     <Teleport to="body">
       <div v-if="mobileOpen" class="fixed inset-0 z-50 lg:hidden">
-        <div class="absolute inset-0 bg-charcoal/50" @click="mobileOpen = false"></div>
+        <Transition name="drawer-backdrop" appear>
+          <div class="absolute inset-0 bg-charcoal/50" @click="mobileOpen = false"></div>
+        </Transition>
+        <Transition name="drawer" appear>
         <aside class="absolute right-0 top-0 h-full w-full max-w-xs bg-paper border-l border-charcoal/15 flex flex-col shadow-2xl">
           <div class="flex items-center justify-between px-6 h-20 border-b border-charcoal/10">
             <span class="font-display font-extrabold text-xl">Menu</span>
@@ -121,14 +135,19 @@ function doLogout() {
             <button class="btn-outline w-full" @click="doLogout">Sign out</button>
           </div>
         </aside>
+        </Transition>
       </div>
     </Teleport>
 
     <!-- Cart drawer -->
     <Teleport to="body">
       <div v-if="cartOpen" class="fixed inset-0 z-50">
-        <div class="absolute inset-0 bg-charcoal/50" @click="cartOpen = false"></div>
-        <CartDrawer @close="cartOpen = false" />
+        <Transition name="drawer-backdrop" appear>
+          <div class="absolute inset-0 bg-charcoal/50" @click="cartOpen = false"></div>
+        </Transition>
+        <Transition name="drawer" appear>
+          <CartDrawer @close="cartOpen = false" />
+        </Transition>
       </div>
     </Teleport>
   </header>

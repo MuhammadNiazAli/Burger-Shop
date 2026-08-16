@@ -1,5 +1,7 @@
 <script setup lang="ts">
 const { currentUser, updateProfile, changePassword, logout } = useAuth()
+const { ask } = useConfirm()
+const toast = useToast()
 
 const nameInput = ref(currentUser.value?.name ?? '')
 const nameSaved = ref(false)
@@ -27,9 +29,11 @@ function saveName() {
   const result = updateProfile({ name: nameInput.value })
   if (!result.ok) {
     nameError.value = result.error || 'Could not update your name.'
+    toast.error('Could not save', nameError.value)
     return
   }
   nameSaved.value = true
+  toast.success('Details updated')
   setTimeout(() => (nameSaved.value = false), 2200)
 }
 
@@ -45,25 +49,38 @@ function handleAvatarChange(event: Event) {
 
   if (!file.type.startsWith('image/')) {
     avatarError.value = 'Please choose an image file.'
+    toast.error('Invalid file', avatarError.value)
     return
   }
   if (file.size > 1.5 * 1024 * 1024) {
     avatarError.value = 'Please choose an image under 1.5MB.'
+    toast.error('File too large', avatarError.value)
     return
   }
 
   const reader = new FileReader()
   reader.onload = () => {
     updateProfile({ avatar: reader.result as string })
+    toast.success('Photo updated')
   }
   reader.onerror = () => {
     avatarError.value = 'Could not read that file. Please try another image.'
+    toast.error('Upload failed', avatarError.value)
   }
   reader.readAsDataURL(file)
 }
 
-function removeAvatar() {
+async function removeAvatar() {
+  const confirmed = await ask({
+    title: 'Remove profile photo?',
+    message: 'You can always upload a new one later.',
+    confirmLabel: 'Remove photo',
+    cancelLabel: 'Keep it',
+    tone: 'danger'
+  })
+  if (!confirmed) return
   updateProfile({ avatar: null })
+  toast.success('Photo removed')
 }
 
 function savePassword() {
@@ -71,22 +88,34 @@ function savePassword() {
   passwordSaved.value = false
   if (newPassword.value !== confirmPassword.value) {
     passwordError.value = 'New password and confirmation do not match.'
+    toast.error('Passwords don\'t match', passwordError.value)
     return
   }
   const result = changePassword(currentPassword.value, newPassword.value)
   if (!result.ok) {
     passwordError.value = result.error || 'Could not update your password.'
+    toast.error('Could not update password', passwordError.value)
     return
   }
   currentPassword.value = ''
   newPassword.value = ''
   confirmPassword.value = ''
   passwordSaved.value = true
+  toast.success('Password updated')
   setTimeout(() => (passwordSaved.value = false), 2200)
 }
 
-function doLogout() {
+async function doLogout() {
+  const confirmed = await ask({
+    title: 'Sign out of Burger Shop?',
+    message: 'Your account, ticket and order history stay saved for next time — you\'ll just need to log back in.',
+    confirmLabel: 'Sign out',
+    cancelLabel: 'Stay logged in',
+    tone: 'danger'
+  })
+  if (!confirmed) return
   logout()
+  toast.success('Signed out', 'Come back hungry.')
   navigateTo('/login', { replace: true })
 }
 </script>

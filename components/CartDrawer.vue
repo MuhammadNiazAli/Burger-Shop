@@ -1,11 +1,19 @@
 <script setup lang="ts">
 const emit = defineEmits(['close'])
 const { lines, add, decrease, total } = useCart()
+const toast = useToast()
 
 function goToCheckout() {
   if (lines.value.length === 0) return
   emit('close')
   navigateTo('/checkout')
+}
+
+function handleDecrease(id: string, name: string) {
+  const line = lines.value.find((l) => l.id === id)
+  const willRemove = !!line && line.qty <= 1
+  decrease(id)
+  if (willRemove) toast.info('Removed from ticket', name)
 }
 </script>
 
@@ -23,19 +31,19 @@ function goToCheckout() {
         <p class="text-smoke text-sm">Your ticket is empty. Add something from the menu.</p>
       </div>
 
-      <ul v-else class="space-y-5">
+      <TransitionGroup v-else tag="ul" name="cart-line" class="space-y-5">
         <li v-for="line in lines" :key="line.id" class="flex items-start justify-between gap-3">
           <div>
             <p class="font-semibold text-sm">{{ line.name }}</p>
             <p class="font-mono text-xs text-smoke mt-1">${{ line.price.toFixed(2) }} each</p>
           </div>
           <div class="flex items-center gap-3 font-mono text-sm">
-            <button class="w-6 h-6 border border-charcoal/25 hover:border-flame hover:text-flame" @click="decrease(line.id)">−</button>
-            <span class="w-4 text-center">{{ line.qty }}</span>
-            <button class="w-6 h-6 border border-charcoal/25 hover:border-flame hover:text-flame" @click="add({ id: line.id, name: line.name, price: line.price } as any)">+</button>
+            <button class="w-6 h-6 border border-charcoal/25 hover:border-flame hover:text-flame transition-all duration-150 active:scale-90" @click="handleDecrease(line.id, line.name)">−</button>
+            <span class="w-4 text-center tabular-nums">{{ line.qty }}</span>
+            <button class="w-6 h-6 border border-charcoal/25 hover:border-flame hover:text-flame transition-all duration-150 active:scale-90" @click="add({ id: line.id, name: line.name, price: line.price } as any)">+</button>
           </div>
         </li>
-      </ul>
+      </TransitionGroup>
     </div>
 
     <div class="border-t border-charcoal/10 px-6 py-6">

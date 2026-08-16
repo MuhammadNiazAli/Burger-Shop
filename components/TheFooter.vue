@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const toast = useToast()
 const year = new Date().getFullYear()
 const email = ref('')
 const subscribed = ref(false)
@@ -6,6 +7,7 @@ const subscribed = ref(false)
 function subscribe() {
   if (!email.value) return
   subscribed.value = true
+  toast.success('You\'re on the list', 'Weekly specials land in your inbox from now on.')
   email.value = ''
   setTimeout(() => (subscribed.value = false), 3000)
 }

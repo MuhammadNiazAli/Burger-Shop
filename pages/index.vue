@@ -4,6 +4,7 @@ import { menu, categories } from '~/data/menu'
 const { currentUser } = useAuth()
 const { add } = useCart()
 const { resolveImage } = useFoodImages()
+const toast = useToast()
 const activeCategory = ref<typeof categories[number]>('Burgers')
 const search = ref('')
 const sortBy = ref<'popular' | 'price-asc' | 'price-desc' | 'rating'>('popular')
@@ -32,6 +33,7 @@ const spotlightAdded = ref(false)
 function addSpotlight() {
   add(spotlight)
   spotlightAdded.value = true
+  toast.success('Added to your ticket', spotlight.name)
   setTimeout(() => (spotlightAdded.value = false), 900)
 }
 
@@ -129,7 +131,7 @@ const testimonials = [
     <section class="mx-auto max-w-6xl px-5 sm:px-8 py-14 sm:py-16">
       <span class="eyebrow">Fan favourites</span>
       <h2 class="font-display font-extrabold text-3xl sm:text-4xl mt-2 mb-8">Where to start</h2>
-      <div class="grid sm:grid-cols-3 gap-6">
+      <div class="grid sm:grid-cols-3 gap-6 rise-in">
         <MenuCard v-for="item in featured" :key="item.id" :item="item" />
       </div>
     </section>
@@ -174,7 +176,7 @@ const testimonials = [
       <div v-if="filtered.length === 0" class="ticket p-10 text-center">
         <p class="text-charcoal/60 text-sm">Nothing matches "{{ search }}" in {{ activeCategory }}. Try another search.</p>
       </div>
-      <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 rise-in" :key="activeCategory + search + sortBy">
         <MenuCard v-for="item in filtered" :key="item.id" :item="item" />
       </div>
     </section>
@@ -204,7 +206,7 @@ const testimonials = [
     <section class="mx-auto max-w-6xl px-5 sm:px-8 py-16 sm:py-20">
       <span class="eyebrow">What people order again</span>
       <h2 class="font-display font-extrabold text-3xl sm:text-4xl mt-2 mb-10">Straight from the tickets</h2>
-      <div class="grid sm:grid-cols-3 gap-6">
+      <div class="grid sm:grid-cols-3 gap-6 rise-in">
         <div v-for="t in testimonials" :key="t.name" class="ticket p-6 flex flex-col">
           <StarRating :rating="5" class="mb-4" />
           <p class="font-accent italic text-charcoal/80 leading-relaxed flex-1">&ldquo;{{ t.quote }}&rdquo;</p>

@@ -17,7 +17,7 @@ const items = computed(() => menu.filter((m) => ids.value.includes(m.id)))
       <NuxtLink to="/" class="btn-outline mt-6 inline-flex">Browse menu</NuxtLink>
     </div>
 
-    <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 rise-in">
       <MenuCard v-for="item in items" :key="item.id" :item="item" />
     </div>
   </div>

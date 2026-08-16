@@ -5,10 +5,12 @@ const props = defineProps<{ item: MenuItem }>()
 const { add } = useCart()
 const { resolveImage } = useFoodImages()
 const { isFavorite, toggle, load: loadFavorites } = useFavorites()
+const toast = useToast()
 
 const justAdded = ref(false)
 const photo = ref<string | null>(null)
 const photoLoading = ref(true)
+const heartBounce = ref(false)
 
 onMounted(async () => {
   loadFavorites()
@@ -19,7 +21,20 @@ onMounted(async () => {
 function handleAdd() {
   add(props.item)
   justAdded.value = true
+  toast.success('Added to your ticket', props.item.name)
   setTimeout(() => (justAdded.value = false), 900)
+}
+
+function handleToggleFavorite() {
+  const wasFavorite = isFavorite(props.item.id)
+  toggle(props.item.id)
+  heartBounce.value = true
+  setTimeout(() => (heartBounce.value = false), 400)
+  if (wasFavorite) {
+    toast.info('Removed from favorites', props.item.name)
+  } else {
+    toast.success('Saved to favorites', props.item.name)
+  }
 }
 </script>
 
@@ -31,11 +46,11 @@ function handleAdd() {
       </span>
 
       <button
-        class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-paper/90 backdrop-blur flex items-center justify-center transition-colors"
+        class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-paper/90 backdrop-blur flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
         :aria-label="isFavorite(item.id) ? 'Remove from favorites' : 'Add to favorites'"
-        @click="toggle(item.id)"
+        @click="handleToggleFavorite"
       >
-        <svg width="15" height="15" viewBox="0 0 24 24" :fill="isFavorite(item.id) ? '#E3572A' : 'none'" stroke="currentColor" stroke-width="2" :class="isFavorite(item.id) ? 'text-flame' : 'text-charcoal/50'">
+        <svg width="15" height="15" viewBox="0 0 24 24" :fill="isFavorite(item.id) ? '#E3572A' : 'none'" stroke="currentColor" stroke-width="2" class="transition-colors" :class="[isFavorite(item.id) ? 'text-flame' : 'text-charcoal/50', heartBounce && 'heart-pop']">
           <path d="M20.8 8.6a5.5 5.5 0 0 0-9.4-3.9L12 5.3l-.6-.6A5.5 5.5 0 0 0 3.2 8.6c0 1.5.6 2.9 1.6 3.9l6.6 6.6a.9.9 0 0 0 1.3 0l6.6-6.6c1-1 1.6-2.4 1.6-3.9Z"/>
         </svg>
       </button>
@@ -62,10 +77,11 @@ function handleAdd() {
       <p class="text-sm text-charcoal/60 leading-relaxed flex-1">{{ item.desc }}</p>
 
       <button
-        class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold uppercase tracking-wide font-mono transition-colors"
+        class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold uppercase tracking-wide font-mono transition-all duration-150 active:scale-[0.97]"
         :class="justAdded ? 'bg-basil text-paper' : 'bg-charcoal text-paper hover:bg-flame'"
         @click="handleAdd"
       >
+        <svg v-if="justAdded" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" class="heart-pop"><path d="M20 6L9 17l-5-5"/></svg>
         {{ justAdded ? 'Added to ticket' : 'Add to ticket' }}
       </button>
     </div>

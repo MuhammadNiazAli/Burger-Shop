@@ -1,12 +1,17 @@
 <script setup lang="ts">
+const toast = useToast()
 const name = ref('')
 const email = ref('')
 const message = ref('')
 const sent = ref(false)
 
 function handleSubmit() {
-  if (!name.value || !email.value || !message.value) return
+  if (!name.value || !email.value || !message.value) {
+    toast.error('Missing details', 'Please fill in every field before sending.')
+    return
+  }
   sent.value = true
+  toast.success('Message sent', 'We\'ll get back to you within a day or two.')
   name.value = ''
   email.value = ''
   message.value = ''

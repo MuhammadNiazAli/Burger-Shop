@@ -42,12 +42,12 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 bg-ember text-charcoal font-mono font-semibold uppercase tracking-wide text-sm px-6 py-3 transition-transform duration-150 hover:-translate-y-0.5 hover:bg-ember/90 active:translate-y-0;
+    @apply inline-flex items-center justify-center gap-2 bg-ember text-charcoal font-mono font-semibold uppercase tracking-wide text-sm px-6 py-3 transition-all duration-150 hover:-translate-y-0.5 hover:bg-ember/90 hover:shadow-[0_10px_24px_-10px_rgba(227,160,8,0.6)] active:translate-y-0 active:scale-[0.98];
     clip-path: polygon(0 0, 100% 0, 100% 70%, 96% 100%, 0 100%);
   }
 
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 border border-charcoal/25 text-charcoal font-mono uppercase tracking-wide text-sm px-6 py-3 transition-colors duration-150 hover:border-charcoal hover:bg-charcoal hover:text-paper;
+    @apply inline-flex items-center justify-center gap-2 border border-charcoal/25 text-charcoal font-mono uppercase tracking-wide text-sm px-6 py-3 transition-all duration-150 hover:border-charcoal hover:bg-charcoal hover:text-paper active:scale-[0.98];
   }
 
   .field {
@@ -60,11 +60,90 @@
 
   .page-enter-active,
   .page-leave-active {
-    transition: opacity 0.16s ease;
+    transition: opacity 0.22s ease, transform 0.22s ease;
   }
-  .page-enter-from,
+  .page-enter-from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
   .page-leave-to {
     opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  /* Staggered rise-in for grids of cards (menu grid, ticket lists, etc).
+     Add `.rise-in` to the wrapping grid; children fade/rise in with a
+     per-item delay driven by nth-child, so lists never feel like they
+     just "appear" from a template. */
+  .rise-in > * {
+    animation: rise-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .rise-in > *:nth-child(1) { animation-delay: 0ms; }
+  .rise-in > *:nth-child(2) { animation-delay: 60ms; }
+  .rise-in > *:nth-child(3) { animation-delay: 120ms; }
+  .rise-in > *:nth-child(4) { animation-delay: 180ms; }
+  .rise-in > *:nth-child(5) { animation-delay: 240ms; }
+  .rise-in > *:nth-child(6) { animation-delay: 300ms; }
+  .rise-in > *:nth-child(n+7) { animation-delay: 340ms; }
+
+  @keyframes rise-up {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Heart "pop" when an item is favorited */
+  @keyframes heart-pop {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.35); }
+    60% { transform: scale(0.92); }
+    100% { transform: scale(1); }
+  }
+  .heart-pop {
+    animation: heart-pop 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Drawer slide transitions (cart + mobile nav) */
+  .drawer-enter-active,
+  .drawer-leave-active {
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .drawer-enter-from,
+  .drawer-leave-to {
+    transform: translateX(100%);
+  }
+  .drawer-backdrop-enter-active,
+  .drawer-backdrop-leave-active {
+    transition: opacity 0.25s ease;
+  }
+  .drawer-backdrop-enter-from,
+  .drawer-backdrop-leave-to {
+    opacity: 0;
+  }
+
+  /* Cart line items animate in/out and reflow smoothly */
+  .cart-line-enter-active,
+  .cart-line-leave-active {
+    transition: opacity 0.22s ease, transform 0.22s ease;
+  }
+  .cart-line-enter-from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  .cart-line-leave-to {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  .cart-line-leave-active {
+    position: absolute;
+  }
+  .cart-line-move {
+    transition: transform 0.22s ease;
   }
 
   @media (prefers-reduced-motion: reduce) {

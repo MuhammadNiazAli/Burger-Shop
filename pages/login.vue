@@ -3,6 +3,7 @@ definePageMeta({ layout: 'default' })
 
 const { login } = useAuth()
 const route = useRoute()
+const toast = useToast()
 
 const email = ref('')
 const password = ref('')
@@ -16,8 +17,10 @@ function handleSubmit() {
   loading.value = false
   if (!result.ok) {
     error.value = result.error || 'Something went wrong.'
+    toast.error('Could not log in', error.value)
     return
   }
+  toast.success('Welcome back!', 'The grill\'s still hot.')
   const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
   navigateTo(redirect, { replace: true })
 }

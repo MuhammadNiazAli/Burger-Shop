@@ -3,6 +3,7 @@ definePageMeta({ layout: 'default' })
 
 const { signup } = useAuth()
 const route = useRoute()
+const toast = useToast()
 
 const name = ref('')
 const email = ref('')
@@ -17,8 +18,10 @@ function handleSubmit() {
   loading.value = false
   if (!result.ok) {
     error.value = result.error || 'Something went wrong.'
+    toast.error('Could not sign up', error.value)
     return
   }
+  toast.success('Account created', `Welcome to Burger Shop, ${name.value.trim().split(' ')[0]}.`)
   const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
   navigateTo(redirect, { replace: true })
 }

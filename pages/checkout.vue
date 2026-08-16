@@ -3,6 +3,7 @@ import type { PaymentMethod } from '~/composables/useOrders'
 
 const { lines, total, clear } = useCart()
 const { record } = useOrders()
+const toast = useToast()
 
 onMounted(() => {
   if (lines.value.length === 0) navigateTo('/', { replace: true })
@@ -19,6 +20,7 @@ function handlePlaceOrder() {
   error.value = ''
   if (!street.value.trim() || !city.value.trim() || !phone.value.trim()) {
     error.value = 'Please fill in your delivery address and phone number.'
+    toast.error('Missing details', error.value)
     return
   }
   placing.value = true
@@ -29,6 +31,7 @@ function handlePlaceOrder() {
     payment.value
   )
   clear()
+  toast.success('Order placed!', `Ticket #${order.id} is headed to the grill.`)
   navigateTo(`/orders?placed=${order.id}`, { replace: true })
 }
 </script>

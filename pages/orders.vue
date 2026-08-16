@@ -5,6 +5,7 @@ import { menu } from '~/data/menu'
 const { orders, load } = useOrders()
 const { add } = useCart()
 const route = useRoute()
+const toast = useToast()
 
 onMounted(() => load())
 
@@ -34,6 +35,7 @@ function reorder(order: (typeof orders.value)[number]) {
     if (!item) continue
     for (let i = 0; i < line.qty; i++) add(item)
   }
+  toast.success('Added to your ticket', `Ticket #${order.id} is back in your cart.`)
   navigateTo('/checkout')
 }
 </script>
