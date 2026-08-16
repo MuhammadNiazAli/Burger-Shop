@@ -87,7 +87,7 @@ function savePassword() {
 
 function doLogout() {
   logout()
-  navigateTo('/login')
+  navigateTo('/login', { replace: true })
 }
 </script>
 

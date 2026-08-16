@@ -19,7 +19,7 @@ function handleSubmit() {
     return
   }
   const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
-  navigateTo(redirect)
+  navigateTo(redirect, { replace: true })
 }
 </script>
 
